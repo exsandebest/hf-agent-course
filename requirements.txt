@@ -1,2 +1,12 @@
 gradio
+numpy
+openpyxl
+pandas
 requests
+smolagents
+smolagents[audio]
+smolagents[openai]
+smolagents[transformers]
+transformers
+wikipedia-api
+youtube-transcript-api
