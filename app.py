@@ -34,7 +34,7 @@ def run_and_submit_all(profile: gr.OAuthProfile | None):
     and displays the results.
     """
     # --- Determine HF Space Runtime URL and Repo URL ---
-    space_id = os.getenv("SPACE_ID")  # Get the SPACE_ID for sending link to the code
+    space_id = "exsandebest/agent-course-final-assessment"  # Get the SPACE_ID for sending link to the code
 
     if profile:
         username = f"{profile.username}"
@@ -51,7 +51,7 @@ def run_and_submit_all(profile: gr.OAuthProfile | None):
     # 1. Instantiate Agent ( modify this part to create your agent)
     try:
         agent = Agent(
-            model=get_model("OpenAIServerModel", "gpt-4.1-mini"), tools=get_tools()
+            model=get_model("OpenAIServerModel", "gpt-4.1"), tools=get_tools()
         )
     except Exception as e:
         print(f"Error instantiating agent: {e}")
@@ -215,8 +215,8 @@ with gr.Blocks() as demo:
 if __name__ == "__main__":
     print("\n" + "-" * 30 + " App Starting " + "-" * 30)
     # Check for SPACE_HOST and SPACE_ID at startup for information
-    space_host_startup = os.getenv("SPACE_HOST")
-    space_id_startup = os.getenv("SPACE_ID")  # Get SPACE_ID at startup
+    space_host_startup = "exsandebest-agent-course-final-assessment.hf.space"
+    space_id_startup = "exsandebest/agent-course-final-assessment"
 
     if space_host_startup:
         print(f"✅ SPACE_HOST found: {space_host_startup}")
