@@ -2,6 +2,8 @@ gradio
 numpy
 openpyxl
 pandas
+pillow
+pytesseract
 requests
 smolagents
 smolagents[audio]

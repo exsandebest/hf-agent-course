@@ -3,7 +3,7 @@ import logging
 
 def get_logger(name: str = __name__) -> logging.Logger:
     """
-    Create and configure a logger.
+    Create and configure a logger instance for the given module or name.
 
     Args:
         name (str, optional): Name of the logger. Defaults to the module name.

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 from smolagents import CodeAgent
 
@@ -8,15 +8,24 @@ logger = get_logger(__name__)
 
 
 class Agent:
+    """
+    Agent class that wraps a CodeAgent and provides a callable interface for answering questions.
+
+    Args:
+        model (Any): The language model to use.
+        tools (Optional[List[Any]]): List of tools to provide to the agent.
+        prompt (Optional[str]): Custom prompt template for the agent.
+    """
+
     def __init__(
-        self, model: Any, tools: Optional[list] = None, prompt: Optional[str] = None
+        self,
+        model: Any,
+        tools: Optional[List[Any]] = None,
+        prompt: Optional[str] = None,
     ):
         logger.info("Initializing Agent")
-
         self.model = model
-
         self.tools = tools
-
         self.imports = [
             "pandas",
             "numpy",
@@ -28,15 +37,14 @@ class Agent:
             "time",
             "re",
             "openpyxl",
+            "pathlib",
         ]
-
         self.agent = CodeAgent(
             model=self.model,
             tools=self.tools,
             add_base_tools=True,
             additional_authorized_imports=self.imports,
         )
-
         self.prompt = prompt or (
             """
             You are an advanced AI assistant specialized in solving complex, real-world tasks that require multi-step reasoning, factual accuracy, and use of external tools.
@@ -57,10 +65,19 @@ class Agent:
             ANSWER:
             """
         )
-
         logger.info("Agent initialized")
 
     def __call__(self, question: str, file_path: Optional[str] = None) -> str:
+        """
+        Run the agent to answer a question, optionally using a file as context.
+
+        Args:
+            question (str): The question to answer.
+            file_path (Optional[str]): Path to a file to use as context (if any).
+
+        Returns:
+            str: The agent's answer as a string.
+        """
         answer = self.agent.run(
             self.prompt.format(question=question, context=file_path)
         )

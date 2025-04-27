@@ -1,6 +1,7 @@
 import inspect
 import os
 import tempfile
+from typing import Any, Optional, Tuple
 
 import gradio as gr
 import pandas as pd
@@ -17,21 +18,19 @@ DEFAULT_API_URL = "https://agents-course-unit4-scoring.hf.space"
 
 # --- Basic Agent Definition ---
 # ----- THIS IS WERE YOU CAN BUILD WHAT YOU WANT ------
-class BasicAgent:
-    def __init__(self):
-        print("BasicAgent initialized.")
-
-    def __call__(self, question: str) -> str:
-        print(f"Agent received question (first 50 chars): {question[:50]}...")
-        fixed_answer = "This is a default answer."
-        print(f"Agent returning fixed answer: {fixed_answer}")
-        return fixed_answer
 
 
-def run_and_submit_all(profile: gr.OAuthProfile | None):
+def run_and_submit_all(
+    profile: Optional[gr.OAuthProfile],
+) -> Tuple[str, Optional[pd.DataFrame]]:
     """
-    Fetches all questions, runs the BasicAgent on them, submits all answers,
-    and displays the results.
+    Fetches all questions, runs the Agent on them, submits all answers, and displays the results.
+
+    Args:
+        profile (Optional[gr.OAuthProfile]): The OAuth profile of the user.
+
+    Returns:
+        Tuple[str, Optional[pd.DataFrame]]: Status message and DataFrame of results.
     """
     # --- Determine HF Space Runtime URL and Repo URL ---
     space_id = "exsandebest/agent-course-final-assessment"  # Get the SPACE_ID for sending link to the code
@@ -56,7 +55,7 @@ def run_and_submit_all(profile: gr.OAuthProfile | None):
     except Exception as e:
         print(f"Error instantiating agent: {e}")
         return f"Error initializing agent: {e}", None
-    # In the case of an app running as a hugging Face space, this link points toward your codebase ( usefull for others so please keep it public)
+    # In the case of an app running as a hugging Face space, this link points toward your codebase (usefull for others so please keep it public)
     agent_code = f"https://huggingface.co/spaces/{space_id}/tree/main"
     print(agent_code)
 
@@ -92,7 +91,7 @@ def run_and_submit_all(profile: gr.OAuthProfile | None):
             print(f"Skipping item with missing task_id or question: {item}")
             continue
         try:
-            file_path = None
+            file_path: Optional[str] = None
             try:
                 file_response = requests.get(f"{files_url}/{task_id}", timeout=15)
                 if file_response.status_code == 200 and file_response.content:
@@ -207,7 +206,6 @@ with gr.Blocks() as demo:
     status_output = gr.Textbox(
         label="Run Status / Submission Result", lines=5, interactive=False
     )
-    # Removed max_rows=10 from DataFrame constructor
     results_table = gr.DataFrame(label="Questions and Agent Answers", wrap=True)
 
     run_button.click(fn=run_and_submit_all, outputs=[status_output, results_table])
