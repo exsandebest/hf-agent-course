@@ -12,3 +12,5 @@ smolagents[transformers]
 transformers
 wikipedia-api
 youtube-transcript-api
+openai-whisper
+openai

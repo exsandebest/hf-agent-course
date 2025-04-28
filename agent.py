@@ -38,6 +38,7 @@ class Agent:
             "re",
             "openpyxl",
             "pathlib",
+            "sys",
         ]
         self.agent = CodeAgent(
             model=self.model,
@@ -55,12 +56,14 @@ class Agent:
             - Reason step-by-step. Think through the solution logically and plan your actions carefully before answering.
             - Validate information. Always verify facts when possible instead of guessing.
             - Use code if needed. For calculations, parsing, or transformations, generate Python code and execute it. But be careful, some questions contains time-consuming tasks, so you should be careful with the code you run. Better analyze the question and think about the best way to solve it.
+            - Don't forget to use `final_answer` to give the final answer.
+            - Use name of file ONLY FROM "FILE:" section. THIS IF ALWAYS A FILE.
 
             IMPORTANT: When giving the final answer, output only the direct required result without any extra text like "Final Answer:" or explanations. YOU MUST RESPOND IN THE EXACT FORMAT AS THE QUESTION.
 
             QUESTION: {question}
 
-            CONTEXT: {context}
+            FILE: {context}
 
             ANSWER:
             """

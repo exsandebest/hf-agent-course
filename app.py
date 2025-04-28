@@ -9,7 +9,7 @@ import requests
 
 from agent import Agent
 from model import get_model
-from tools import get_tools
+from tools.tools import get_tools
 
 # (Keep Constants as is)
 # --- Constants ---
@@ -33,7 +33,7 @@ def run_and_submit_all(
         Tuple[str, Optional[pd.DataFrame]]: Status message and DataFrame of results.
     """
     # --- Determine HF Space Runtime URL and Repo URL ---
-    space_id = "exsandebest/agent-course-final-assessment"  # Get the SPACE_ID for sending link to the code
+    space_id = os.getenv("SPACE_ID") # Get the SPACE_ID for sending link to the code
 
     if profile:
         username = f"{profile.username}"
@@ -95,10 +95,26 @@ def run_and_submit_all(
             try:
                 file_response = requests.get(f"{files_url}/{task_id}", timeout=15)
                 if file_response.status_code == 200 and file_response.content:
-                    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-                        tmp_file.write(file_response.content)
-                        file_path = tmp_file.name
-                        print(f"Downloaded file for task {task_id} to {file_path}")
+                    # Get filename from Content-Disposition header or URL
+                    filename = None
+                    content_disposition = file_response.headers.get(
+                        "Content-Disposition"
+                    )
+                    if content_disposition and "filename=" in content_disposition:
+                        filename = content_disposition.split("filename=")[-1].strip('"')
+                    else:
+                        # Try to get filename from URL
+                        url = file_response.url
+                        filename = url.split("/")[-1]
+                        if not filename or filename == str(task_id):
+                            filename = f"file_{task_id}"
+
+                    # Create temp directory and save file with original name
+                    temp_dir = tempfile.mkdtemp()
+                    file_path = os.path.join(temp_dir, filename)
+                    with open(file_path, "wb") as f:
+                        f.write(file_response.content)
+                    print(f"Downloaded file for task {task_id} to {file_path}")
                 else:
                     print(f"No file for task {task_id} or file is empty.")
             except Exception as e:
@@ -213,8 +229,8 @@ with gr.Blocks() as demo:
 if __name__ == "__main__":
     print("\n" + "-" * 30 + " App Starting " + "-" * 30)
     # Check for SPACE_HOST and SPACE_ID at startup for information
-    space_host_startup = "exsandebest-agent-course-final-assessment.hf.space"
-    space_id_startup = "exsandebest/agent-course-final-assessment"
+    space_host_startup = os.getenv("SPACE_HOST")
+    space_id_startup = os.getenv("SPACE_ID")
 
     if space_host_startup:
         print(f"✅ SPACE_HOST found: {space_host_startup}")
